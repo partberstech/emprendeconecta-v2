@@ -78,4 +78,13 @@ public class ProductoController {
         catalogoServicio.eliminarProducto(idProducto, autenticacion.getName());
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/productos/buscar")
+    public ResponseEntity<Page<ProductoResponse>> buscarProductosPorTexto(
+            @RequestParam String q,
+            @RequestParam(defaultValue = "0") int pagina,
+            @RequestParam(defaultValue = "10") int tamanio) {
+        var respuesta = catalogoServicio.buscarProductosPorTexto(q, pagina, tamanio);
+        return ResponseEntity.ok(respuesta);
+    }
 }

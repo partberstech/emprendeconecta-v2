@@ -1,6 +1,5 @@
 {
   "build": {
-    "builder": "NIXPACKS",
-    "dockerfilePath": "Dockerfile"
+    "builder": "NIXPACKS"
   }
 }

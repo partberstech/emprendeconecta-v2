@@ -4,6 +4,7 @@ import com.market.market.dto.AuthResponse;
 import com.market.market.dto.LoginRequest;
 import com.market.market.dto.PerfilActualizarRequest;
 import com.market.market.dto.PerfilResponse;
+import com.market.market.dto.RefreshTokenRequest;
 import com.market.market.dto.RegistroRequest;
 import com.market.market.services.AuthServicio;
 import jakarta.validation.Valid;
@@ -50,6 +51,13 @@ public class AuthController {
             Authentication autenticacion,
             @Valid @RequestBody PerfilActualizarRequest solicitud) {
         var respuesta = authServicio.actualizarPerfil(autenticacion.getName(), solicitud);
+        return ResponseEntity.ok(respuesta);
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<AuthResponse> refrescarToken(
+            @Valid @RequestBody RefreshTokenRequest solicitud) {
+        var respuesta = authServicio.refrescarToken(solicitud);
         return ResponseEntity.ok(respuesta);
     }
 }
