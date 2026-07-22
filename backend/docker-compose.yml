@@ -1,0 +1,39 @@
+version: "3.8"
+
+services:
+  db:
+    image: mysql:8
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: market
+      MYSQL_USER: marketuser
+      MYSQL_PASSWORD: Muni2025!
+      MYSQL_ROOT_PASSWORD: rootpassword
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build: .
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      DB_URL: jdbc:mysql://db:3306/market?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      DB_USERNAME: marketuser
+      DB_PASSWORD: Muni2025!
+      JWT_SECRET: MiClaveSecretaSuperSegura2026ParaJWTMarketPlace
+      JWT_EXPIRACION: "86400000"
+      CORS_ORIGINS: http://localhost:5173,http://localhost:3000
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  mysql_data:
