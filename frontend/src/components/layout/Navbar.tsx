@@ -17,7 +17,7 @@ import { useCart } from '@/stores/cart'
 import { useUI } from '@/stores/ui'
 import { cn } from '@/lib/cn'
 
-export default function Navbar() {
+export default function Navbar({ onMenuToggle }: { onMenuToggle?: () => void }) {
   const navigate = useNavigate()
   const location = useLocation()
   const { usuario, isAuthenticated, logout } = useAuth()
@@ -215,6 +215,15 @@ export default function Navbar() {
             )}
 
             {/* Mobile hamburger */}
+            {onMenuToggle && (
+              <button
+                onClick={() => { setMobileOpen(false); onMenuToggle() }}
+                className="md:hidden p-2 rounded-lg text-surface-600 dark:text-surface-400 hover:bg-surface-100 dark:hover:bg-surface-800 transition-colors"
+                aria-label="Abrir menú lateral"
+              >
+                <Menu className="w-5 h-5" />
+              </button>
+            )}
             <button
               onClick={() => setMobileOpen((prev) => !prev)}
               className="md:hidden p-2 rounded-lg text-surface-600 dark:text-surface-400 hover:bg-surface-100 dark:hover:bg-surface-800 transition-colors"

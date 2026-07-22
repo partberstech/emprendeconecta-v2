@@ -37,16 +37,13 @@ export default function Login() {
   const onSubmit = async (data: LoginFormData) => {
     setErrorGlobal(null)
     try {
-      const res = await login(data.email, data.password)
-      // Use the returned usuario to redirect
-      if (res) {
-        const rol = (res as { usuario?: { rol?: string } }).usuario?.rol?.toLowerCase()
-        if (rol === 'emprendedor') navigate('/dashboard')
-        else if (rol === 'administrador') navigate('/admin')
-        else navigate('/')
-      } else {
-        navigate('/')
-      }
+      await login(data.email, data.password)
+      // Read user from store after successful login
+      const { usuario } = useAuth.getState()
+      const rol = usuario?.rol?.toLowerCase()
+      if (rol === 'emprendedor') navigate('/dashboard')
+      else if (rol === 'administrador') navigate('/admin')
+      else navigate('/')
     } catch (err) {
       setErrorGlobal(err instanceof Error ? err.message : 'Error al iniciar sesión')
     }

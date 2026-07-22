@@ -17,16 +17,27 @@ public class JwtUtil {
 
     private final SecretKey claveFirma;
     private final long expiracion;
+    private final long refreshExpiracion;
 
     public JwtUtil(@Value("${app.jwt.secret}") String secreto,
-                   @Value("${app.jwt.expiracion}") long expiracion) {
+                   @Value("${app.jwt.expiracion}") long expiracion,
+                   @Value("${app.jwt.refresh-expiracion}") long refreshExpiracion) {
         this.claveFirma = Keys.hmacShaKeyFor(secreto.getBytes(StandardCharsets.UTF_8));
         this.expiracion = expiracion;
+        this.refreshExpiracion = refreshExpiracion;
     }
 
     public String generarToken(Long idUsuario, String correo, String rol) {
+        return generarTokenConExpiracion(idUsuario, correo, rol, expiracion);
+    }
+
+    public String generarRefreshToken(Long idUsuario, String correo, String rol) {
+        return generarTokenConExpiracion(idUsuario, correo, rol, refreshExpiracion);
+    }
+
+    private String generarTokenConExpiracion(Long idUsuario, String correo, String rol, long expiracionMs) {
         var ahora = Instant.now();
-        var vencimiento = ahora.plusMillis(expiracion);
+        var vencimiento = ahora.plusMillis(expiracionMs);
 
         return Jwts.builder()
                 .subject(correo)

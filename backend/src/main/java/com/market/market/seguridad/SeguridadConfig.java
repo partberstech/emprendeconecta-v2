@@ -43,9 +43,11 @@ public class SeguridadConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(autorizar -> autorizar
                         .requestMatchers("/api/v1/auth/**").permitAll()
+                        .requestMatchers("/api/v1/health").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/categorias/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/emprendimientos/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/productos/**").permitAll()
+                        .requestMatchers("/api/v1/uploads/**").permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(filtroAutenticacionJwt,
                         UsernamePasswordAuthenticationFilter.class);

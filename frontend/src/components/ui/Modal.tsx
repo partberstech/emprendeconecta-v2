@@ -6,7 +6,7 @@ import { cn } from '@/lib/cn'
 const overlayVariants = {
   hidden: { opacity: 0 },
   visible: { opacity: 1 },
-}
+} as const
 
 const panelVariants = {
   hidden: { opacity: 0, scale: 0.95, y: 12 },
@@ -14,10 +14,10 @@ const panelVariants = {
     opacity: 1,
     scale: 1,
     y: 0,
-    transition: { type: 'spring', stiffness: 350, damping: 30 },
+    transition: { type: 'spring' as const, stiffness: 350, damping: 30 },
   },
   exit: { opacity: 0, scale: 0.95, y: 12, transition: { duration: 0.15 } },
-}
+} as const
 
 export interface ModalProps {
   /** Whether the modal is open */

@@ -5,6 +5,7 @@ import com.market.market.dto.AuthUsuarioResponse;
 import com.market.market.dto.LoginRequest;
 import com.market.market.dto.PerfilActualizarRequest;
 import com.market.market.dto.PerfilResponse;
+import com.market.market.dto.RefreshTokenRequest;
 import com.market.market.dto.RegistroRequest;
 import com.market.market.entities.Usuario;
 import com.market.market.exceptions.AuthExcepcion;
@@ -62,6 +63,7 @@ public class AuthServicioImpl implements AuthServicio {
 
         return new AuthResponse(
                 token,
+                jwtUtil.generarRefreshToken(usuario.getIdUsuario(), usuario.getCorreoElectronico(), usuario.getRol().name()),
                 new AuthUsuarioResponse(
                         usuario.getIdUsuario(),
                         usuario.getNombreCompleto(),
@@ -95,6 +97,42 @@ public class AuthServicioImpl implements AuthServicio {
 
         return new AuthResponse(
                 token,
+                jwtUtil.generarRefreshToken(usuario.getIdUsuario(), usuario.getCorreoElectronico(), usuario.getRol().name()),
+                new AuthUsuarioResponse(
+                        usuario.getIdUsuario(),
+                        usuario.getNombreCompleto(),
+                        usuario.getCorreoElectronico(),
+                        usuario.getRol().name()
+                )
+        );
+    }
+
+    @Override
+    public AuthResponse refrescarToken(RefreshTokenRequest solicitud) {
+        var refreshToken = solicitud.getRefreshToken();
+
+        if (!jwtUtil.esTokenValido(refreshToken)) {
+            throw new AuthExcepcion("Refresh token inválido o expirado");
+        }
+
+        var correo = jwtUtil.extraerCorreo(refreshToken);
+        var idUsuario = jwtUtil.extraerIdUsuario(refreshToken);
+        var roles = jwtUtil.extraerRoles(refreshToken);
+
+        var rol = roles.stream()
+                .findFirst()
+                .map(r -> r.replace("ROLE_", ""))
+                .orElseThrow(() -> new AuthExcepcion("Rol no encontrado en el token"));
+
+        var nuevoToken = jwtUtil.generarToken(idUsuario, correo, rol);
+        var nuevoRefreshToken = jwtUtil.generarRefreshToken(idUsuario, correo, rol);
+
+        var usuario = usuarioRepository.findById(idUsuario)
+                .orElseThrow(() -> new AuthExcepcion(USUARIO_NO_ENCONTRADO));
+
+        return new AuthResponse(
+                nuevoToken,
+                nuevoRefreshToken,
                 new AuthUsuarioResponse(
                         usuario.getIdUsuario(),
                         usuario.getNombreCompleto(),

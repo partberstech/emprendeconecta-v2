@@ -134,6 +134,19 @@ public class CatalogoServicioImpl implements CatalogoServicio {
     }
 
     @Override
+    public Page<ProductoResponse> buscarProductosPorTexto(String termino, int pagina, int tamanio) {
+        var paginacion = PageRequest.of(pagina, tamanio, Sort.by("nombre").ascending());
+        try {
+            var paginaProductos = productoServicioRepository.buscarTextoCompleto(termino, paginacion);
+            return paginaProductos.map(this::construirResponse);
+        } catch (Exception e) {
+            // Fallback a LIKE si MySQL no tiene FULLTEXT index
+            var paginaProductos = productoServicioRepository.buscarPorLike(termino, paginacion);
+            return paginaProductos.map(this::construirResponse);
+        }
+    }
+
+    @Override
     public List<ProductoResponse> listarProductosPorEmprendimiento(Long idEmprendimiento) {
         var emprendimiento = emprendimientoRepository.findById(idEmprendimiento)
                 .orElseThrow(() -> new RecursoNoEncontradoExcepcion(EMPRENDIMIENTO_NO_ENCONTRADO));

@@ -4,7 +4,7 @@ import { Search, SlidersHorizontal, X, Package, ChevronLeft, ChevronRight } from
 import { Link } from 'react-router-dom'
 import { api, extractList } from '@/lib/api'
 import { cn } from '@/lib/cn'
-import type { Categoria, Producto, PaginatedResponse } from '@/types'
+import type { Categoria, Producto } from '@/types'
 
 const ITEMS_PER_PAGE = 12
 

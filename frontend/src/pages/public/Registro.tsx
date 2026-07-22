@@ -7,7 +7,6 @@ import { motion } from 'framer-motion'
 import { Eye, EyeOff, UserPlus } from 'lucide-react'
 import { useAuth } from '@/stores/auth'
 import { cn } from '@/lib/cn'
-import type { Rol } from '@/types'
 
 const registroSchema = z
   .object({
@@ -66,7 +65,6 @@ export default function Registro() {
         email: data.email,
         password: data.password,
         rol: data.rol,
-        telefono: data.telefono || undefined,
       })
       navigate('/')
     } catch (err) {
@@ -240,8 +238,9 @@ export default function Registro() {
                     key={option.value}
                     className={cn(
                       'flex flex-1 cursor-pointer flex-col items-center gap-1 rounded-xl border-2 px-4 py-3 text-center transition-all',
-                      // We handle checked state via the form, but can't easily get current value here
-                      // So we rely on the hidden radio + styling with peer
+                      'border-surface-200 dark:border-surface-700',
+                      'has-[:checked]:border-brand-500 has-[:checked]:bg-brand-50',
+                      'dark:has-[:checked]:border-brand-400 dark:has-[:checked]:bg-brand-900/20',
                     )}
                   >
                     <input

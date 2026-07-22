@@ -22,14 +22,14 @@ const fadeUp = {
   initial: { opacity: 0, y: 40 },
   whileInView: { opacity: 1, y: 0 },
   viewport: { once: true, margin: '-80px' },
-  transition: { duration: 0.6, ease: 'easeOut' },
+  transition: { duration: 0.6, ease: 'easeOut' as const },
 }
 
 const stagger = {
   initial: { opacity: 0, y: 30 },
   whileInView: { opacity: 1, y: 0 },
   viewport: { once: true },
-  transition: { duration: 0.5, ease: 'easeOut', staggerChildren: 0.08 },
+  transition: { duration: 0.5, ease: 'easeOut' as const, staggerChildren: 0.08 },
 }
 
 export default function Home() {

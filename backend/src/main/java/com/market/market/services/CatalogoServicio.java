@@ -23,6 +23,8 @@ public interface CatalogoServicio {
                                             BigDecimal precioMin, BigDecimal precioMax,
                                             int pagina, int tamanio);
 
+    Page<ProductoResponse> buscarProductosPorTexto(String termino, int pagina, int tamanio);
+
     List<ProductoResponse> listarProductosPorEmprendimiento(Long idEmprendimiento);
 
     ProductoResponse actualizarProducto(Long idProducto, ProductoRequest solicitud, String correoUsuario);
