@@ -1,14 +1,14 @@
-FROM eclipse-temurin:21-jdk AS build
+FROM eclipse-temurin:21-jdk-alpine AS build
 WORKDIR /app
 COPY mvnw pom.xml ./
 COPY .mvn .mvn
 RUN chmod +x mvnw
-RUN ./mvnw dependency:go-offline -B
+RUN ./mvnw dependency:go-offline -B -q
 COPY src src
-RUN ./mvnw clean package -DskipTests -B
+RUN ./mvnw clean package -DskipTests -B -q
 
-FROM eclipse-temurin:21-jre
+FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
-COPY --from=build /app/target/*.jar app.jar
+COPY --from=build /app/target/emprendeconecta-2.0.0.jar app.jar
 EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "app.jar"]
