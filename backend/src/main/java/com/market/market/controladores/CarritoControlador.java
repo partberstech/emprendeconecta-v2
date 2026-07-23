@@ -44,11 +44,11 @@ public class CarritoControlador {
     }
 
     @DeleteMapping("/items/{idItem}")
-    public ResponseEntity<CarritoResponse> eliminarItem(
+    public ResponseEntity<Void> eliminarItem(
             @PathVariable Long idItem,
             Authentication autenticacion) {
-        var respuesta = carritoServicio.eliminarItem(autenticacion.getName(), idItem);
-        return ResponseEntity.ok(respuesta);
+        carritoServicio.eliminarItem(autenticacion.getName(), idItem);
+        return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping
