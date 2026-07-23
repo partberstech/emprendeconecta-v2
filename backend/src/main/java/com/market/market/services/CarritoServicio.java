@@ -5,13 +5,13 @@ import com.market.market.dto.CarritoResponse;
 
 public interface CarritoServicio {
 
-    CarritoResponse obtenerCarritoActivo(Long idUsuario);
+    CarritoResponse obtenerCarrito(String correoUsuario);
 
-    CarritoResponse agregarItem(Long idUsuario, CarritoItemRequest solicitud);
+    CarritoResponse agregarItem(String correoUsuario, CarritoItemRequest solicitud);
 
-    CarritoResponse actualizarCantidadItem(Long idUsuario, Long idItem, Integer cantidad);
+    CarritoResponse actualizarCantidad(String correoUsuario, Long idItem, CarritoItemRequest solicitud);
 
-    void eliminarItem(Long idUsuario, Long idItem);
+    void eliminarItem(String correoUsuario, Long idItem);
 
-    void vaciarCarrito(Long idUsuario);
+    void limpiarCarrito(String correoUsuario);
 }

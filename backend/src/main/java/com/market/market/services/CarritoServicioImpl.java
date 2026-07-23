@@ -6,10 +6,12 @@ import com.market.market.dto.CarritoResponse;
 import com.market.market.entities.Carrito;
 import com.market.market.entities.CarritoItem;
 import com.market.market.entities.ProductoServicio;
+import com.market.market.entities.Usuario;
 import com.market.market.exceptions.RecursoNoEncontradoExcepcion;
 import com.market.market.repositories.CarritoItemRepository;
 import com.market.market.repositories.CarritoRepository;
 import com.market.market.repositories.ProductoServicioRepository;
+import com.market.market.repositories.UsuarioRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,6 +21,7 @@ import java.util.stream.Collectors;
 @Service
 public class CarritoServicioImpl implements CarritoServicio {
 
+    private static final String USUARIO_NO_ENCONTRADO = "Usuario no encontrado";
     private static final String CARRITO_NO_ENCONTRADO = "Carrito no encontrado";
     private static final String PRODUCTO_NO_ENCONTRADO = "Producto no encontrado";
     private static final String ITEM_NO_ENCONTRADO = "Item del carrito no encontrado";
@@ -26,26 +29,30 @@ public class CarritoServicioImpl implements CarritoServicio {
     private final CarritoRepository carritoRepository;
     private final CarritoItemRepository carritoItemRepository;
     private final ProductoServicioRepository productoServicioRepository;
+    private final UsuarioRepository usuarioRepository;
 
     public CarritoServicioImpl(CarritoRepository carritoRepository,
                                 CarritoItemRepository carritoItemRepository,
-                                ProductoServicioRepository productoServicioRepository) {
+                                ProductoServicioRepository productoServicioRepository,
+                                UsuarioRepository usuarioRepository) {
         this.carritoRepository = carritoRepository;
         this.carritoItemRepository = carritoItemRepository;
         this.productoServicioRepository = productoServicioRepository;
+        this.usuarioRepository = usuarioRepository;
     }
 
     @Override
-    public CarritoResponse obtenerCarritoActivo(Long idUsuario) {
+    public CarritoResponse obtenerCarrito(String correoUsuario) {
+        var idUsuario = obtenerIdUsuario(correoUsuario);
         var carrito = carritoRepository.findByIdUsuarioAndEstado(idUsuario, "ACTIVO")
                 .orElseGet(() -> crearNuevoCarrito(idUsuario));
-
         return construirResponse(carrito);
     }
 
     @Override
     @Transactional
-    public CarritoResponse agregarItem(Long idUsuario, CarritoItemRequest solicitud) {
+    public CarritoResponse agregarItem(String correoUsuario, CarritoItemRequest solicitud) {
+        var idUsuario = obtenerIdUsuario(correoUsuario);
         var producto = productoServicioRepository.findById(solicitud.getIdProducto())
                 .orElseThrow(() -> new RecursoNoEncontradoExcepcion(PRODUCTO_NO_ENCONTRADO));
 
@@ -74,13 +81,13 @@ public class CarritoServicioImpl implements CarritoServicio {
 
         carrito = carritoRepository.findByIdUsuarioAndEstado(idUsuario, "ACTIVO")
                 .orElseThrow(() -> new RecursoNoEncontradoExcepcion(CARRITO_NO_ENCONTRADO));
-
         return construirResponse(carrito);
     }
 
     @Override
     @Transactional
-    public CarritoResponse actualizarCantidadItem(Long idUsuario, Long idItem, Integer cantidad) {
+    public CarritoResponse actualizarCantidad(String correoUsuario, Long idItem, CarritoItemRequest solicitud) {
+        var idUsuario = obtenerIdUsuario(correoUsuario);
         var carrito = carritoRepository.findByIdUsuarioAndEstado(idUsuario, "ACTIVO")
                 .orElseThrow(() -> new RecursoNoEncontradoExcepcion(CARRITO_NO_ENCONTRADO));
 
@@ -89,6 +96,7 @@ public class CarritoServicioImpl implements CarritoServicio {
                 .findFirst()
                 .orElseThrow(() -> new RecursoNoEncontradoExcepcion(ITEM_NO_ENCONTRADO));
 
+        var cantidad = solicitud.getCantidad();
         if (cantidad <= 0) {
             carrito.getItems().remove(item);
         } else {
@@ -96,13 +104,13 @@ public class CarritoServicioImpl implements CarritoServicio {
         }
 
         carritoRepository.save(carrito);
-
         return construirResponse(carrito);
     }
 
     @Override
     @Transactional
-    public void eliminarItem(Long idUsuario, Long idItem) {
+    public void eliminarItem(String correoUsuario, Long idItem) {
+        var idUsuario = obtenerIdUsuario(correoUsuario);
         var carrito = carritoRepository.findByIdUsuarioAndEstado(idUsuario, "ACTIVO")
                 .orElseThrow(() -> new RecursoNoEncontradoExcepcion(CARRITO_NO_ENCONTRADO));
 
@@ -117,12 +125,19 @@ public class CarritoServicioImpl implements CarritoServicio {
 
     @Override
     @Transactional
-    public void vaciarCarrito(Long idUsuario) {
+    public void limpiarCarrito(String correoUsuario) {
+        var idUsuario = obtenerIdUsuario(correoUsuario);
         var carrito = carritoRepository.findByIdUsuarioAndEstado(idUsuario, "ACTIVO")
                 .orElseThrow(() -> new RecursoNoEncontradoExcepcion(CARRITO_NO_ENCONTRADO));
 
         carrito.getItems().clear();
         carritoRepository.save(carrito);
+    }
+
+    private Long obtenerIdUsuario(String correoUsuario) {
+        return usuarioRepository.findByCorreoElectronico(correoUsuario)
+                .map(Usuario::getIdUsuario)
+                .orElseThrow(() -> new RecursoNoEncontradoExcepcion(USUARIO_NO_ENCONTRADO));
     }
 
     private Carrito crearNuevoCarrito(Long idUsuario) {
